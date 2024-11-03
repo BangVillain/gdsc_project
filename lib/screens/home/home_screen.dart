@@ -1,0 +1,36 @@
+import 'package:flutter/material.dart';
+import 'package:gdsc_project/config/colors/app_colors.dart';
+import 'package:gdsc_project/screens/home/widgets/home_app_bar.dart';
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: PreferredSize(
+          preferredSize: Size.fromHeight(52), child: HomeAppBar()),
+      body: Center(child: Text("홈", style: TextStyle(fontSize: 32))),
+      floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {},
+          backgroundColor: AppColors.grey3,
+          elevation: 3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          label: const Row(
+            children: [
+              Icon(Icons.create_rounded, color: Colors.white, size: 24),
+              SizedBox(width: 8),
+              Text(
+                "기록하기",
+                style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold),
+              )
+            ],
+          )),
+    );
+  }
+}
