@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gdsc_project/config/colors/app_colors.dart';
+import 'package:gdsc_project/screens/home/diary_main.dart';
 import 'package:gdsc_project/screens/home/widgets/home_app_bar.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -8,9 +9,9 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
+      appBar: const PreferredSize(
           preferredSize: Size.fromHeight(52), child: HomeAppBar()),
-      body: Center(child: Text("홈", style: TextStyle(fontSize: 32))),
+      body: const Center(child: const DiaryMain()),
       floatingActionButton: FloatingActionButton.extended(
           onPressed: () {},
           backgroundColor: AppColors.grey3,
