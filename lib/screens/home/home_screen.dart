@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gdsc_project/config/colors/app_colors.dart';
 import 'package:gdsc_project/screens/home/diary_main.dart';
 import 'package:gdsc_project/screens/home/widgets/home_app_bar.dart';
+import 'package:gdsc_project/screens/diary/diary_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -11,9 +12,17 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: const PreferredSize(
           preferredSize: Size.fromHeight(52), child: HomeAppBar()),
-      body: const DiaryMain(),    // 홈 화면에 다이어리 내용 표시
+      body: const DiaryMain(), // 홈 화면에 다이어리 내용 표시
       floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              //버튼을 눌렀을 때의 이벤트
+              context,
+              MaterialPageRoute(
+                builder: (context) => const DiaryScreen(), // DiaryScreen 이동
+              ),
+            );
+          },
           backgroundColor: AppColors.grey3,
           elevation: 3,
           shape: RoundedRectangleBorder(
