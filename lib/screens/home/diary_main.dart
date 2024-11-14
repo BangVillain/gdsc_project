@@ -27,7 +27,7 @@ class DiaryMain extends StatelessWidget {
               return Container(
                 margin: const EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: const Color.fromARGB(255, 255, 255, 255), // 다이어리 내용 색깔
                   border: Border(
                     right: BorderSide(
                       color: Colors.brown[200]!,
