@@ -16,6 +16,7 @@ class _HomeCalendarState extends State<HomeCalendar> {
   DateTime selectedDay = DateTime.now(); // 기본적으로 오늘 날짜로 설정
   int selectedYear = DateTime.now().year;
   int selectedMonth = DateTime.now().month;
+  final List<String> customWeekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
   // 샘플 일기 데이터 (날짜별)
   Map<DateTime, Map<String, dynamic>> diaryEntries = {
@@ -64,8 +65,9 @@ class _HomeCalendarState extends State<HomeCalendar> {
       body: Column(
         children: [
           // 연도와 월을 선택하는 Dropdown 메뉴
+
           Padding(
-            padding: const EdgeInsets.all(40),
+            padding: const EdgeInsets.all(25),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -104,15 +106,46 @@ class _HomeCalendarState extends State<HomeCalendar> {
               ],
             ),
           ),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: customWeekdays.asMap().entries.map((entry) {
+              int index = entry.key;
+              String day = entry.value;
+
+              return Flexible(
+                child: Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: (index == 5 || index == 6)
+                        ? Colors.red.withOpacity(0.1) // 주말 배경색
+                        : Colors.blue.withOpacity(0.1), // 평일 배경색
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Text(
+                    day,
+                    style: TextStyle(
+                      color: (index == 5 || index == 6)
+                          ? Colors.red
+                          : Colors.blue, // 주말 텍스트 색상
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
           Padding(
             padding: const EdgeInsets.all(20),
             child: TableCalendar(
               locale: 'ko_KR',
               firstDay: DateTime.utc(2000),
               lastDay: DateTime.utc(2030),
+
               focusedDay: focusedDay,
               calendarFormat: CalendarFormat.month,
               headerVisible: false,
+              daysOfWeekHeight: 0, // 기본 요일 헤더 숨김
               onPageChanged: (newFocusedDay) {
                 setState(() {
                   focusedDay = newFocusedDay;
@@ -204,16 +237,16 @@ class _HomeCalendarState extends State<HomeCalendar> {
                 children: [
                   if (getDiaryEntry(selectedDay) != null) ...[
                     Text(
-                      getDiaryEntry(selectedDay)!['text'] ?? '일기 없음',
+                      getDiaryEntry(selectedDay)!['text'] ?? '작성된 일기가 없습니다',
                       style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
                     Image.asset(
                       getDiaryEntry(selectedDay)!['image'] ??
                           'assets/images/default.jpg',
-                      fit: BoxFit.cover,
-                      height: 200,
+                      fit: BoxFit.fitWidth,
+                      height: 239,
                     ),
                   ] else
                     Text('일기 없음', style: TextStyle(fontSize: 16)),
