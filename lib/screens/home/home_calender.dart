@@ -28,7 +28,6 @@ class _HomeCalendarState extends State<HomeCalendar> {
       'text': '일기 제목: 강아지와 산책을 다녀왔다.',
       'image': 'assets/images/walkdog.jpeg',
     },
-    // 더 많은 일기 내용을 추가
   };
 
   Map<String, dynamic>? getDiaryEntry(DateTime day) {
@@ -59,15 +58,24 @@ class _HomeCalendarState extends State<HomeCalendar> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // 비율 기반 크기 조정
+    final calendarHeight = screenHeight * 0.39; // 캘린더 높이 비율
+    final diaryPreviewHeight = screenHeight * 0.25; // 미리보기 높이 비율
+
     return Scaffold(
       appBar: const PreferredSize(
-          preferredSize: Size.fromHeight(52), child: CalenderAppBar()),
+        preferredSize: Size.fromHeight(52),
+        child: CalenderAppBar(),
+      ),
       body: Column(
         children: [
           // 연도와 월을 선택하는 Dropdown 메뉴
-
           Padding(
-            padding: const EdgeInsets.all(25),
+            padding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -107,6 +115,7 @@ class _HomeCalendarState extends State<HomeCalendar> {
             ),
           ),
 
+          // 요일 표시 Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: customWeekdays.asMap().entries.map((entry) {
@@ -121,7 +130,7 @@ class _HomeCalendarState extends State<HomeCalendar> {
                         ? Colors.red.withOpacity(0.1) // 주말 배경색
                         : Colors.blue.withOpacity(0.1), // 평일 배경색
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 6),
                   child: Text(
                     day,
                     style: TextStyle(
@@ -129,23 +138,27 @@ class _HomeCalendarState extends State<HomeCalendar> {
                           ? Colors.red
                           : Colors.blue, // 주말 텍스트 색상
                       fontWeight: FontWeight.bold,
+                      fontSize: screenWidth * 0.05,
                     ),
                   ),
                 ),
               );
             }).toList(),
           ),
-          Padding(
-            padding: const EdgeInsets.all(20),
+
+          // 캘린더 영역
+          Container(
+            height: calendarHeight,
+            color: Colors.grey[100],
             child: TableCalendar(
               locale: 'ko_KR',
               firstDay: DateTime.utc(2000),
               lastDay: DateTime.utc(2030),
-
+              rowHeight: 62,
               focusedDay: focusedDay,
               calendarFormat: CalendarFormat.month,
               headerVisible: false,
-              daysOfWeekHeight: 0, // 기본 요일 헤더 숨김
+              daysOfWeekHeight: 0,
               onPageChanged: (newFocusedDay) {
                 setState(() {
                   focusedDay = newFocusedDay;
@@ -154,72 +167,114 @@ class _HomeCalendarState extends State<HomeCalendar> {
                 });
               },
               selectedDayPredicate: (day) {
-                // 선택된 날짜를 기준으로 스타일 적용
                 return isSameDay(selectedDay, day);
               },
               onDaySelected: (selectedDay, focusedDay) {
                 setState(() {
-                  this.selectedDay = selectedDay; // 선택된 날짜 업데이트
+                  this.selectedDay = selectedDay;
                   this.focusedDay = focusedDay;
                 });
               },
-              calendarStyle: CalendarStyle(
-                defaultDecoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(6.0),
-                ),
-                weekendDecoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(6.0),
-                ),
-                todayDecoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(6.0),
-                ),
-                // 오늘 날짜의 기본 스타일 제거
-                selectedDecoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  shape: BoxShape.rectangle, // 사각형 모양
-                  border: Border.all(color: Colors.purpleAccent, width: 5),
-                ),
-                defaultTextStyle: const TextStyle(
-                  color: Colors.purple,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-                weekendTextStyle: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Colors.purple,
-                ), // 기본 텍스트 스타일
-                todayTextStyle: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Colors.purple,
-                ),
-                selectedTextStyle: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Colors.purple), // 선택한 날짜 텍스트 스타일
-              ),
-              daysOfWeekStyle: DaysOfWeekStyle(
-                weekendStyle: const TextStyle(
-                    color: Colors.red,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold), // 주말 색상
-                weekdayStyle: const TextStyle(
-                    color: Colors.blue,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold), // 평일 색상
+              calendarBuilders: CalendarBuilders(
+                defaultBuilder: (context, day, focusedDay) {
+                  final diaryEntry = getDiaryEntry(day);
+                  return Container(
+                    width: 66,
+                    height: 66,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(6.0),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (diaryEntry != null)
+                          Image.asset(
+                            height: 30,
+                            diaryEntry['image']!,
+                            fit: BoxFit.cover,
+                          ),
+                        Text(
+                          '${day.day}',
+                          style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.purple),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                todayBuilder: (context, day, focusedDay) {
+                  final diaryEntry = getDiaryEntry(day);
+                  return Container(
+                    width: 66,
+                    height: 66,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(6.0),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (diaryEntry != null)
+                          Image.asset(
+                            height: 30,
+                            diaryEntry['image']!,
+                            fit: BoxFit.cover,
+                          ),
+                        Text(
+                          '${day.day}',
+                          style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.purple),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                selectedBuilder: (context, day, focusedDay) {
+                  final diaryEntry = getDiaryEntry(day);
+                  return Container(
+                    width: 66,
+                    height: 66,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      shape: BoxShape.rectangle, // 사각형 모양
+                      border: Border.all(color: Colors.purpleAccent, width: 5),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (diaryEntry != null)
+                          Image.asset(
+                            height: 30,
+                            diaryEntry['image']!,
+                            fit: BoxFit.cover,
+                          ),
+                        Text(
+                          '${day.day}',
+                          style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.purple),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
           ),
-          // 선택된 날짜의 일기 미리보기 위젯
-          Padding(
-            padding: const EdgeInsets.all(16.0),
+
+          // 일기 미리보기 영역
+          Container(
+            height: diaryPreviewHeight,
+            padding:
+                const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
@@ -228,29 +283,35 @@ class _HomeCalendarState extends State<HomeCalendar> {
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 5,
                     blurRadius: 7,
-                    offset: Offset(0, 3),
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (getDiaryEntry(selectedDay) != null) ...[
-                    Text(
-                      getDiaryEntry(selectedDay)!['text'] ?? '작성된 일기가 없습니다',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10),
-                    Image.asset(
-                      getDiaryEntry(selectedDay)!['image'] ??
-                          'assets/images/default.jpg',
-                      fit: BoxFit.fitWidth,
-                      height: 239,
-                    ),
-                  ] else
-                    Text('일기 없음', style: TextStyle(fontSize: 16)),
-                ],
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (getDiaryEntry(selectedDay) != null) ...[
+                      Text(
+                        getDiaryEntry(selectedDay)!['text'] ?? '작성된 일기가 없습니다',
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      Image.asset(
+                        getDiaryEntry(selectedDay)!['image'] ??
+                            'assets/images/default.jpg',
+                        fit: BoxFit.cover,
+                      ),
+                    ] else
+                      const Text(
+                        '작성된 일기가 없습니다',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
