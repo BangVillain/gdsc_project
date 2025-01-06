@@ -11,7 +11,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: const PreferredSize(
           preferredSize: Size.fromHeight(52), child: HomeAppBar()),
-      body: const Center(child: const DiaryMain()),
+      body: const DiaryMain(),    // 홈 화면에 다이어리 내용 표시
       floatingActionButton: FloatingActionButton.extended(
           onPressed: () {},
           backgroundColor: AppColors.grey3,
