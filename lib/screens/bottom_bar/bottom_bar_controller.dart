@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gdsc_project/screens/bottom_bar/bottom_bar_widget.dart';
 import 'package:gdsc_project/screens/home/home_screen.dart';
 import 'package:gdsc_project/screens/home/sticker_book.dart';
+import 'package:gdsc_project/screens/home/django_test.dart';
 
 class BottomBarController extends StatelessWidget {
   const BottomBarController({super.key});
@@ -21,9 +22,7 @@ class BottomBarController extends StatelessWidget {
                   child: Center(
                       child: Text("캘린더", style: TextStyle(fontSize: 32)))),
               HomeScreen(),
-              SafeArea(
-                  child: Center(
-                      child: Text("즐겨찾기", style: TextStyle(fontSize: 32)))),
+              DjangoTest(),
               SafeArea(
                   child: Center(
                       child: Text("설정", style: TextStyle(fontSize: 32)))),
