@@ -5,6 +5,7 @@ import 'package:gdsc_project/screens/home/home_screen.dart';
 
 import '../home/home_calender.dart';
 import 'package:gdsc_project/screens/home/sticker_book.dart';
+import 'package:gdsc_project/screens/home/django_test.dart';
 
 class BottomBarController extends StatelessWidget {
   const BottomBarController({super.key});
@@ -21,9 +22,7 @@ class BottomBarController extends StatelessWidget {
               StickerAlbumPage(),
               const HomeCalendar(),
               HomeScreen(),
-              SafeArea(
-                  child: Center(
-                      child: Text("즐겨찾기", style: TextStyle(fontSize: 32)))),
+              DjangoTest(),
               SafeArea(
                   child: Center(
                       child: Text("설정", style: TextStyle(fontSize: 32)))),

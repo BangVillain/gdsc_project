@@ -23,7 +23,7 @@ class StickerAlbumApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '스티커 도감',
+      title: '내 스티커 목록',
       theme: ThemeData(
         primarySwatch: Colors.purple,
         brightness: Brightness.light,
