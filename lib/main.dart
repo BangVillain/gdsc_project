@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gdsc_project/screens/bottom_bar/bottom_bar_controller.dart';
+import 'package:intl/date_symbol_data_local.dart'; // 올바른 경로
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // 반드시 초기화
+  await initializeDateFormatting('ko_KR', null);
   runApp(const MyApp());
 }
 
