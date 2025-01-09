@@ -26,14 +26,20 @@ class ApiRequestWidget extends StatefulWidget {
 class _ApiRequestWidgetState extends State<ApiRequestWidget> {
   String _response = '';
   bool isLoading = false;
+  Image? _image;
 
   Future<void> _sendRequest() async {
     setState(() {
       isLoading = true;
       _response = '';
+      _image = null;
     });
 
-    final url = Uri.parse('http://192.168.200.183:8000/bye/'); // 여기에 API URI를 입력하세요.
+    // 테스트용 로컬 주소
+    // final url = Uri.parse('http://192.168.219.107:8000/imgtest/'); // 여기에 API URI를 입력하세요.
+
+    // 실제 서버 주소
+    final url = Uri.parse('http://54.180.141.54:8080/imgtest/'); // 여기에 API URI를 입력하세요.
 
     try {
       final response = await http.get(url);
@@ -41,8 +47,9 @@ class _ApiRequestWidgetState extends State<ApiRequestWidget> {
       if (response.statusCode == 200) {
         final decodedResponse = utf8.decode(response.bodyBytes);
         final data = jsonDecode(decodedResponse);
+        final base64Image = data['image'];
         setState(() {
-          _response = data.toString();
+          _image = Image.memory(base64Decode(base64Image));
         });
       } else {
         setState(() {
@@ -62,18 +69,21 @@ class _ApiRequestWidgetState extends State<ApiRequestWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ElevatedButton(
-          onPressed: _sendRequest,
-          child: Text('Send API Request'),
-        ),
-        SizedBox(height: 20),
-        isLoading
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('API Request Example'),
+      ),
+      body: Center(
+        child: isLoading
             ? CircularProgressIndicator()
-            : Text(_response),
-      ],
+            : _image != null
+                ? _image!
+                : Text(_response),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _sendRequest,
+        child: Icon(Icons.send),
+      ),
     );
   }
 }
