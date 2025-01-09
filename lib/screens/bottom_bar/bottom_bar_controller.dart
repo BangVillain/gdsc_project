@@ -13,6 +13,7 @@ class BottomBarController extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
+      initialIndex: 2,
       length: 5,
       child: Scaffold(
         backgroundColor: Colors.white,
