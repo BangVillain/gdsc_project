@@ -20,11 +20,11 @@ class _HomeCalendarState extends State<HomeCalendar> {
 
   // 샘플 일기 데이터 (날짜별)
   Map<DateTime, Map<String, dynamic>> diaryEntries = {
-    DateTime(2024, 11, 1): {
+    DateTime(2025, 1, 1): {
       'text': '일기 제목: 오늘은 날씨가 맑았다.',
       'image': 'assets/images/sunny.jpg', // 이미지 경로 예시
     },
-    DateTime(2024, 11, 2): {
+    DateTime(2025, 1, 2): {
       'text': '일기 제목: 강아지와 산책을 다녀왔다.',
       'image': 'assets/images/walkdog.jpeg',
     },
