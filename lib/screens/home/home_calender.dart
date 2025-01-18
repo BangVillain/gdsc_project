@@ -26,7 +26,7 @@ class _HomeCalendarState extends State<HomeCalendar> {
       'content': '새해 첫날, 아침부터 창문 밖으로 따뜻한 햇살이 비쳤다. 겨울인데도 불구하고 맑은 하늘이 나를 반갑게 맞이해주었다. 날씨가 너무 좋아서 집에만 있기 아까워 근처 공원으로 산책을 나갔다. '
           '동물원에서는 많은 사람들이 새해를 맞아 운동을 하거나 가족들과 시간을 보내고 있었다. 아이들은 연을 날리며 웃음소리를 가득 채우고, 어르신들은 벤치에 앉아 담소를 나누고 계셨다. 이런 평화로운 광경을 보니 나도 새해의 시작을 잘 준비해야겠다는 다짐이 들었다.'
           '산책을 마치고 집으로 돌아와 따뜻한 차 한 잔과 함께 새해 계획을 정리했다. 올해는 더 건강하게, 더 긍정적으로 살아가기로 마음먹었다. 맑은 날씨가 이런 좋은 결심을 도와준 것 같다.'
-          '맑은 하늘을 보며 기분 좋게 하루를 시작할 수 있어서 감사한 하루였다.',
+          '맑은 하늘을 보면서 기분 좋게 하루를 시작할 수 있어서 감사한 하루였다.',
     },
     DateTime(2025, 1, 2): {
       'text': '일기 제목: 강아지와 산책을 다녀왔다.',
@@ -178,7 +178,7 @@ class _HomeCalendarState extends State<HomeCalendar> {
                   color: Colors.grey[100],
                   child: TableCalendar(
                     locale: 'ko_KR',
-                    firstDay: DateTime.utc(2000),
+                    firstDay: DateTime.utc(2024),
                     lastDay: DateTime.utc(2030),
                     rowHeight: 62,
                     focusedDay: focusedDay,
@@ -317,57 +317,89 @@ class _HomeCalendarState extends State<HomeCalendar> {
                     ),
                   ],
                 ),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (getDiaryEntry(selectedDay) != null) ...[
-                        Text(
-                          getDiaryEntry(selectedDay)!['text'] ?? '작성된 일기가 없습니다',
-                          style: const TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                child: isExpanded
+                    ? SingleChildScrollView(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (getDiaryEntry(selectedDay) != null) ...[
+                              Text(
+                                getDiaryEntry(selectedDay)!['text'] ??
+                                    '작성된 일기가 없습니다',
+                                style: const TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 10),
+                              Image.asset(
+                                getDiaryEntry(selectedDay)!['image'] ??
+                                    'assets/images/default.jpg',
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: screenHeight * 0.2,
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                getDiaryEntry(selectedDay)!['content'] ?? '',
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            ] else
+                              const Text(
+                                '작성된 일기가 없습니다',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                            const SizedBox(height: 10),
+                          ],
                         ),
-                        const SizedBox(height: 10),
-                        Image.asset(
-                          getDiaryEntry(selectedDay)!['image'] ??
-                              'assets/images/default.jpg',
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: screenHeight * 0.2,
-                        ),
-                        if (isExpanded) ...[
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (getDiaryEntry(selectedDay) != null) ...[
+                            Text(
+                              getDiaryEntry(selectedDay)!['text'] ??
+                                  '작성된 일기가 없습니다',
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 10),
+                            Image.asset(
+                              getDiaryEntry(selectedDay)!['image'] ??
+                                  'assets/images/default.jpg',
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: screenHeight * 0.2,
+                            ),
+                            const SizedBox(height: 10), // 여백 추가
+                          ] else
+                            const Text(
+                              '작성된 일기가 없습니다',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
                           const SizedBox(height: 10),
-                          Text(
-                            getDiaryEntry(selectedDay)!['content'] ?? '',
-                            style: const TextStyle(fontSize: 16),
-                          ),
                         ],
-                      ] else
-                        const Text(
-                          '작성된 일기가 없습니다',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                      const SizedBox(height: 10),
-                    ],
-                  ),
-                ),
+                      ),
               ),
             ),
             AnimatedPositioned(
               duration: const Duration(milliseconds: 300),
-              top: isExpanded ? 10 : screenHeight * 0.39 + 110,
+              top: isExpanded ? 10 : screenHeight * 0.39 + 105,
               left: 0,
               right: 0,
               child: Center(
-                child: Container(
-                  width: 70,
-                  height: 7,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[400],
-                    borderRadius: BorderRadius.circular(15),
-                  ),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 70,
+                      height: 7,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[500],
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

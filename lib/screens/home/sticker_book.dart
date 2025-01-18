@@ -43,7 +43,7 @@ class StickerAlbumPage extends StatefulWidget {
 class _StickerAlbumPageState extends State<StickerAlbumPage>
     with TickerProviderStateMixin {
   late TabController _tabController;
-  
+
   // 샘플 데이터 - 실제 앱에서는 데이터베이스나 API에서 가져올 수 있습니다
   final List<StickerItem> stickers = [
     StickerItem(
@@ -107,10 +107,10 @@ class _StickerAlbumPageState extends State<StickerAlbumPage>
       body: TabBarView(
         controller: _tabController,
         children: categories.map((category) {
-          final categoryStickers = stickers.where(
-            (sticker) => sticker.category == category
-          ).toList();
-          
+          final categoryStickers = stickers
+              .where((sticker) => sticker.category == category)
+              .toList();
+
           return GridView.builder(
             padding: const EdgeInsets.all(16),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
