@@ -1,10 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:gdsc_project/screens/home/widgets/calender_app_bar.dart';
-import 'package:http/http.dart' as http;
 import 'package:table_calendar/table_calendar.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:intl/intl.dart';
 import '../../config/colors/app_colors.dart';
 
 class HomeCalendar extends StatefulWidget {
@@ -20,10 +18,8 @@ class _HomeCalendarState extends State<HomeCalendar> {
   int selectedYear = DateTime.now().year;
   int selectedMonth = DateTime.now().month;
   bool isExpanded = false;
-  Image? _image;
   final List<String> customWeekdays = ['일', '월', '화', '수', '목', '금', '토'];
-
-  Map<DateTime, Map<String, dynamic>> diaryEntries = {};
+  Map<String, Map<String, dynamic>> diaryEntries = {};
 
   @override
   void initState() {
@@ -40,62 +36,35 @@ class _HomeCalendarState extends State<HomeCalendar> {
       if (response.statusCode == 200) {
         final decodedResponse = utf8.decode(response.bodyBytes);
         final data = jsonDecode(decodedResponse);
-        setState(() {
-          for (var entry in data['diary']) {
-            DateTime date = DateTime.parse(entry['date']);
-            String imagePath = entry['sticker_path'];
-            final url2 = Uri.parse(
-                'http://52.79.42.44:8080/getimage?sticker_path=$imagePath');
-            final res2 = http.get(url2);
-
-            if (res2.statusCode == 200) {
-              final decodedResponse2 = utf8.decode(res2.bodyBytes);
-              final data2 = jsonDecode(decodedResponse2);
-              final base64Decode = base64Decode(data2['image']);
-              _image = Image.memory(base64Decode);
-            }
-            diaryEntries[date] = {
-              'title': entry['title'],
-              'content': entry['content'],
-              'sticker_path': url2.toString(),
-            };
-          }
-        });
+        await _processDiaryEntries(data['diary']);
+        print(diaryEntries);
       }
     } catch (e) {
-      // Handle error
+      print(e);
     }
   }
 
-  Map<String, dynamic>? getDiaryEntry(DateTime day) {
-    return diaryEntries[DateTime(day.year, day.month, day.day)];
-  }
+  Future<void> _processDiaryEntries(List<dynamic> entries) async {
+    for (var entry in entries) {
+      DateTime date = DateTime.parse(entry['date']);
+      String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+      String imagePath = entry['sticker_path'];
+      final url2 = Uri.parse('http://52.79.42.44:8080/getimage?sticker_path=$imagePath');
+      final res2 = await http.get(url2);
 
-  List<int> years = List<int>.generate(11, (i) => 2020 + i);
-  List<int> months = List<int>.generate(12, (i) => i + 1);
-
-  void _onYearChanged(int? year) {
-    if (year != null) {
-      setState(() {
-        selectedYear = year;
-        focusedDay = DateTime(selectedYear, selectedMonth, 1);
-      });
+      if (res2.statusCode == 200) {
+        final decodedResponse2 = utf8.decode(res2.bodyBytes);
+        final data2 = jsonDecode(decodedResponse2);
+        final base64Decoded = base64Decode(data2['image']);
+        setState(() {
+          diaryEntries[formattedDate] = {
+            'title': entry['title'],
+            'content': entry['content'],
+            'image': Image.memory(base64Decoded),
+          };
+        });
+      }
     }
-  }
-
-  void _onMonthChanged(int? month) {
-    if (month != null) {
-      setState(() {
-        selectedMonth = month;
-        focusedDay = DateTime(selectedYear, selectedMonth, 1);
-      });
-    }
-  }
-
-  void _toggleExpand() {
-    setState(() {
-      isExpanded = !isExpanded;
-    });
   }
 
   @override
@@ -106,12 +75,15 @@ class _HomeCalendarState extends State<HomeCalendar> {
     final calendarHeight = screenHeight * 0.39;
 
     return Scaffold(
-      appBar: const PreferredSize(
-        preferredSize: Size.fromHeight(52),
-        child: CalenderAppBar(),
+      appBar: AppBar(
+        title: const Text('Home Calendar'),
       ),
       body: GestureDetector(
-        onTap: _toggleExpand,
+        onTap: () {
+          setState(() {
+            isExpanded = !isExpanded;
+          });
+        },
         onPanUpdate: (details) {
           if (details.delta.dy < -10) {
             setState(() {
@@ -150,13 +122,18 @@ class _HomeCalendarState extends State<HomeCalendar> {
                             fontSize: 20,
                             fontWeight: FontWeight.bold),
                         value: selectedYear,
-                        items: years.map((year) {
+                        items: List<int>.generate(11, (i) => 2020 + i).map((year) {
                           return DropdownMenuItem(
                             value: year,
                             child: Text('$year년'),
                           );
                         }).toList(),
-                        onChanged: _onYearChanged,
+                        onChanged: (year) {
+                          setState(() {
+                            selectedYear = year!;
+                            focusedDay = DateTime(selectedYear, selectedMonth, 1);
+                          });
+                        },
                       ),
                       const SizedBox(width: 10),
                       DropdownButton<int>(
@@ -165,13 +142,18 @@ class _HomeCalendarState extends State<HomeCalendar> {
                             fontSize: 20,
                             fontWeight: FontWeight.bold),
                         value: selectedMonth,
-                        items: months.map((month) {
+                        items: List<int>.generate(12, (i) => i + 1).map((month) {
                           return DropdownMenuItem(
                             value: month,
                             child: Text('$month월'),
                           );
                         }).toList(),
-                        onChanged: _onMonthChanged,
+                        onChanged: (month) {
+                          setState(() {
+                            selectedMonth = month!;
+                            focusedDay = DateTime(selectedYear, selectedMonth, 1);
+                          });
+                        },
                       ),
                     ],
                   ),
@@ -232,27 +214,11 @@ class _HomeCalendarState extends State<HomeCalendar> {
                         this.selectedDay = selectedDay;
                         this.focusedDay = focusedDay;
                       });
-
-                      final diaryEntry = getDiaryEntry(selectedDay);
-                      if (diaryEntry != null) {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: Text(diaryEntry['title']),
-                            content: Text(diaryEntry['content']),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text("확인"),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
                     },
                     calendarBuilders: CalendarBuilders(
                       defaultBuilder: (context, day, focusedDay) {
-                        final diaryEntry = getDiaryEntry(day);
+                        final formattedDate = DateFormat('yyyy-MM-dd').format(day);
+                        final diaryEntry = diaryEntries[formattedDate];
                         return Container(
                           width: 66,
                           height: 66,
@@ -264,11 +230,7 @@ class _HomeCalendarState extends State<HomeCalendar> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               if (diaryEntry != null)
-                                Image.network(
-                                  diaryEntry['sticker_path']!,
-                                  height: 30,
-                                  fit: BoxFit.cover,
-                                ),
+                                diaryEntry['image'],
                               Text(
                                 '${day.day}',
                                 style: const TextStyle(
@@ -281,7 +243,8 @@ class _HomeCalendarState extends State<HomeCalendar> {
                         );
                       },
                       todayBuilder: (context, day, focusedDay) {
-                        final diaryEntry = getDiaryEntry(day);
+                        final formattedDate = DateFormat('yyyy-MM-dd').format(day);
+                        final diaryEntry = diaryEntries[formattedDate];
                         return Container(
                           width: 66,
                           height: 66,
@@ -293,11 +256,7 @@ class _HomeCalendarState extends State<HomeCalendar> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               if (diaryEntry != null)
-                                Image.network(
-                                  diaryEntry['sticker_path']!,
-                                  height: 30,
-                                  fit: BoxFit.cover,
-                                ),
+                                diaryEntry['image'],
                               Text(
                                 '${day.day}',
                                 style: const TextStyle(
@@ -310,7 +269,8 @@ class _HomeCalendarState extends State<HomeCalendar> {
                         );
                       },
                       selectedBuilder: (context, day, focusedDay) {
-                        final diaryEntry = getDiaryEntry(day);
+                        final formattedDate = DateFormat('yyyy-MM-dd').format(day);
+                        final diaryEntry = diaryEntries[formattedDate];
                         return Container(
                           width: 66,
                           height: 66,
@@ -324,11 +284,7 @@ class _HomeCalendarState extends State<HomeCalendar> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               if (diaryEntry != null)
-                                Image.network(
-                                  diaryEntry['sticker_path']!,
-                                  height: 30,
-                                  fit: BoxFit.cover,
-                                ),
+                                diaryEntry['image'],
                               Text(
                                 '${day.day}',
                                 style: const TextStyle(
@@ -372,24 +328,18 @@ class _HomeCalendarState extends State<HomeCalendar> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (getDiaryEntry(selectedDay) != null) ...[
+                            if (diaryEntries[DateFormat('yyyy-MM-dd').format(selectedDay)] != null) ...[
                               Text(
-                                getDiaryEntry(selectedDay)!['title'] ??
+                                diaryEntries[DateFormat('yyyy-MM-dd').format(selectedDay)]!['title'] ??
                                     '작성된 일기가 없습니다',
                                 style: const TextStyle(
                                     fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 10),
-                              Image.network(
-                                getDiaryEntry(selectedDay)!['sticker_path'] ??
-                                    'assets/images/default.jpg',
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: screenHeight * 0.2,
-                              ),
+                              diaryEntries[DateFormat('yyyy-MM-dd').format(selectedDay)]!['image'],
                               const SizedBox(height: 10),
                               Text(
-                                getDiaryEntry(selectedDay)!['content'] ?? '',
+                                diaryEntries[DateFormat('yyyy-MM-dd').format(selectedDay)]!['content'] ?? '',
                                 style: const TextStyle(fontSize: 16),
                               ),
                             ] else
@@ -405,28 +355,20 @@ class _HomeCalendarState extends State<HomeCalendar> {
                     : Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (getDiaryEntry(selectedDay) != null) ...[
+                          if (diaryEntries[DateFormat('yyyy-MM-dd').format(selectedDay)] != null) ...[
                             Text(
-                              getDiaryEntry(selectedDay)!['title'] ??
+                              diaryEntries[DateFormat('yyyy-MM-dd').format(selectedDay)]!['title'] ??
                                   '작성된 일기가 없습니다',
                               style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 10),
-                            // Image.network(
-                            //   getDiaryEntry(selectedDay)!['sticker_path'] ??
-                            //       'assets/images/default.jpg',
-                            //   fit: BoxFit.cover,
-                            //   width: double.infinity,
-                            //   height: screenHeight * 0.2,
-                            // ),
-                            _image != null
-                                ? _image!
-                                : const SizedBox(
-                                    width: 0,
-                                    height: 0,
-                                  ),
-                            const SizedBox(height: 10), // 여백 추가
+                            diaryEntries[DateFormat('yyyy-MM-dd').format(selectedDay)]!['image'],
+                            const SizedBox(height: 10),
+                            Text(
+                              diaryEntries[DateFormat('yyyy-MM-dd').format(selectedDay)]!['content'] ?? '',
+                              style: const TextStyle(fontSize: 16),
+                            ),
                           ] else
                             const Text(
                               '작성된 일기가 없습니다',
