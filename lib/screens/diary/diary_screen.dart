@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../home/home_screen.dart';
+
 class DiaryScreen extends StatefulWidget {
   const DiaryScreen({super.key});
 
@@ -26,18 +28,16 @@ class _DiaryScreenState extends State<DiaryScreen> {
       isLoading = true;
     });
 
-    final url = Uri.parse(
-        'http://192.168.219.103:8000/reportdiary/'); // Django 서버 URL 예시
+    final url =
+        Uri.parse('http://52.79.42.44:8080/postdiary'); // Django 서버 URL 예시
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'diary': {
-          'title': _titleController.text.isEmpty ? '' : _titleController.text,
-          'content':
-              _contentController.text.isEmpty ? '' : _contentController.text,
-          'date': _dateController.text.isEmpty ? '' : _dateController.text,
-        }
+        'title': _titleController.text.isEmpty ? '' : _titleController.text,
+        'content':
+            _contentController.text.isEmpty ? '' : _contentController.text,
+        'date': _dateController.text.isEmpty ? '' : _dateController.text,
       }),
     );
 
@@ -48,7 +48,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
     if (response.statusCode == 200) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const DiaryScreen()),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } else {
       showDialog(

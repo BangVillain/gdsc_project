@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gdsc_project/config/colors/app_colors.dart';
 import 'package:gdsc_project/screens/home/diary_main.dart';
+import 'package:gdsc_project/screens/home/widgets/calender_app_bar.dart';
 import 'package:gdsc_project/screens/home/widgets/home_app_bar.dart';
 import 'package:gdsc_project/screens/diary/diary_screen.dart';
 
@@ -11,7 +12,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const PreferredSize(
-          preferredSize: Size.fromHeight(52), child: HomeAppBar()),
+          preferredSize: Size.fromHeight(52), child: CalenderAppBar()),
       body: const DiaryMain(), // 홈 화면에 다이어리 내용 표시
       floatingActionButton: FloatingActionButton.extended(
           onPressed: () {

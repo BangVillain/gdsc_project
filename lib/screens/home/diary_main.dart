@@ -20,7 +20,7 @@ class _DiaryMainState extends State<DiaryMain> {
   }
 
   Future<void> _fetchDiaryEntries() async {
-    final url = Uri.parse('http://192.168.219.103:8000/getdiarycontent/');
+    final url = Uri.parse('http://52.79.42.44:8080/getdiary');
 
     try {
       final response = await http.get(url);
@@ -30,6 +30,8 @@ class _DiaryMainState extends State<DiaryMain> {
         final data = jsonDecode(decodedResponse);
         setState(() {
           _diaryEntries = data['diary'];
+          _diaryEntries.sort((a, b) =>
+              DateTime.parse(a['date']).compareTo(DateTime.parse(b['date'])));
           isLoading = false;
         });
       } else {
