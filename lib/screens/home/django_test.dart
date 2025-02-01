@@ -36,14 +36,14 @@ class _ApiRequestWidgetState extends State<ApiRequestWidget> {
     });
 
     // 테스트용 로컬 주소
-    // final url = Uri.parse('http://192.168.220.216:8080/imgtest/'); // 여기에 API URI를 입력하세요.
+    // final url = Uri.parse('http://192.168.219.105:8080/imgtest'); // 여기에 API URI를 입력하세요.
 
     // 실제 서버 주소
-    final url =
-        Uri.parse('http://52.79.42.44:8080/imgtest'); // 여기에 API URI를 입력하세요.
+    final url = Uri.parse('http://52.79.42.44:8080/imgtest'); // 여기에 API URI를 입력하세요.
 
     try {
       final response = await http.get(url);
+
 
       if (response.statusCode == 200) {
         final decodedResponse = utf8.decode(response.bodyBytes);

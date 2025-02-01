@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gdsc_project/screens/bottom_bar/bottom_bar_widget.dart';
 import 'package:gdsc_project/screens/home/home_screen.dart';
 
-import '../home/home_calender.dart';
+import '../home/home_calendar.dart';
 import 'package:gdsc_project/screens/home/sticker_book.dart';
 import 'package:gdsc_project/screens/home/django_test.dart';
 
@@ -20,7 +20,7 @@ class BottomBarController extends StatelessWidget {
             physics: NeverScrollableScrollPhysics(), //가로 스크롤 막기
             children: [
               StickerAlbumPage(),
-              const HomeCalendar(),
+              HomeCalendar(),
               HomeScreen(),
               DjangoTest(),
               SafeArea(
